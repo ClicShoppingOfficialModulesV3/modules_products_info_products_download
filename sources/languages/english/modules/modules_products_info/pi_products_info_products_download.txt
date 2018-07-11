@@ -1,0 +1,5 @@
+
+ module_products_info_products_download_name = Do you want to display an URL to download a File ?
+ module_products_info_products_download_name_description = display an URL to download a File in description page of the product
+ text_products_download_filename = Download
+ text_products_download = Download the file

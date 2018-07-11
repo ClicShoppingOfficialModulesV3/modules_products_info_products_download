@@ -1,0 +1,4 @@
+module_products_info_products_download_name = Souhaitez-vous afficher une URL de téléchargement d'une fiche produit ?
+module_products_info_products_download_name_description = Affiche une URL de téléchargement d'une fiche produit dans la page de description du produit
+text_products_download_filename = Téléchargement :
+text_products_download = Télécharger le fichier
