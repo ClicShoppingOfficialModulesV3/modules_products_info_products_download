@@ -42,12 +42,12 @@
         $CLICSHOPPING_Template = Registry::get('Template');
 
         $Qproducts = $CLICSHOPPING_Db->prepare('select p.products_download_filename,
-                                                       p.products_download_public
-                                                from :table_products p
-                                                where p.products_status = :products_status
-                                                and p.products_id = :products_id
-                                                and p.products_view = :products_view
-                                             ');
+                                                 p.products_download_public
+                                          from :table_products p
+                                          where p.products_status = :products_status
+                                          and p.products_id = :products_id
+                                          and p.products_view = :products_view
+                                       ');
 
         $Qproducts->bindInt(':products_id',   (int)$_GET['products_id'] );
 
@@ -115,7 +115,7 @@
       );
 
       $CLICSHOPPING_Db->save('configuration', [
-          'configuration_title' => 'A quel endroit souhaitez-vous afficher module ?',
+          'configuration_title' => 'A quel endroit souhaitez-vous afficher le code barre ?',
           'configuration_key' => 'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_POSITION',
           'configuration_value' => 'none',
           'configuration_description' => 'Affiche le code barre du produit à gauche ou à droite<br><br><i>(Valeur Left = Gauche <br>Valeur Right = Droite <br>Valeur None = Aucun)</i>',
