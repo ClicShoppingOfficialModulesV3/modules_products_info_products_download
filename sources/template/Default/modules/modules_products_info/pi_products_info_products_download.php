@@ -10,7 +10,6 @@
  */
 
   use ClicShopping\OM\Registry;
-  use ClicShopping\OM\HTML;
   use ClicShopping\OM\CLICSHOPPING;
 
   class pi_products_info_products_download {
@@ -44,17 +43,19 @@
         $CLICSHOPPING_Template = Registry::get('Template');
 
         $Qproducts = $CLICSHOPPING_Db->prepare('select p.products_download_filename,
-                                                 p.products_download_public
-                                          from :table_products p
-                                          where p.products_status = :products_status
-                                          and p.products_id = :products_id
-                                          and p.products_view = :products_view
-                                       ');
+                                                       p.products_download_public
+                                                from :table_products p
+                                                     :table_products_to_categories p2c,
+                                                     :table_categories c                                                
+                                                where p.products_status = 1
+                                                and p.products_id = :products_id
+                                                and p.products_view = 1
+                                                and p.products_id = p2c.products_id
+                                                and p2c.categories_id = c.categories_id
+                                                and c.status = 1       
+                                             ');
 
-        $Qproducts->bindInt(':products_id',   (int)$_GET['products_id'] );
-
-        $Qproducts->bindValue(':products_status',   '1' );
-        $Qproducts->bindValue(':products_view', '1' );
+        $Qproducts->bindInt(':products_id', (int)$_GET['products_id'] );
 
         $Qproducts->execute();
 
