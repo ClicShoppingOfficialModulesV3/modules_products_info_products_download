@@ -11,6 +11,8 @@
 
   use ClicShopping\OM\Registry;
   use ClicShopping\OM\CLICSHOPPING;
+  use ClicShopping\OM\HTML;
+  use ClicShopping\OM\HTTP;
 
   class pi_products_info_products_download {
     public $code;
@@ -34,8 +36,9 @@
     }
 
     public function execute() {
+      $CLICSHOPPING_ProductsCommon = Registry::get('ProductsCommon');
 
-      if (isset($_GET['products_id']) && isset($_GET['Products']) ) {
+      if ($CLICSHOPPING_ProductsCommon->getID() && isset($_GET['Products']) ) {
         $content_width = (int)MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_CONTENT_WIDTH;
         $text_position = MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_POSITION;
 
@@ -44,7 +47,7 @@
 
         $Qproducts = $CLICSHOPPING_Db->prepare('select p.products_download_filename,
                                                        p.products_download_public
-                                                from :table_products p
+                                                from :table_products p,
                                                      :table_products_to_categories p2c,
                                                      :table_categories c                                                
                                                 where p.products_status = 1
@@ -55,23 +58,20 @@
                                                 and c.status = 1       
                                              ');
 
-        $Qproducts->bindInt(':products_id', (int)$_GET['products_id'] );
+        $Qproducts->bindInt(':products_id', $CLICSHOPPING_ProductsCommon->getID());
 
         $Qproducts->execute();
 
-        $products = $Qproducts->fetch();
-
-        $products_download_filename = $products['products_download_filename'];
-        $products_download_public = $products['products_download_public'];
+        $products_download_filename = $Qproducts->value('products_download_filename');
+        $products_download_public = $Qproducts->value('products_download_public');
 
         if (!empty($products_download_filename) && $products_download_public == '1') {
-
-          $url = '<a href="'. 'sources/Download/Public/' . $products['products_download_filename'] . '"> '. CLICSHOPPING::getDef('text_products_download') . '</a>';
+          $url = HTML::link(HTTP::getShopUrlDomain() . 'sources/Download/public/' . $products_download_filename, CLICSHOPPING::getDef('text_products_download_filename'));
 
           $products_products_download_content = '<!-- Start products_produtcs_download-->' . "\n";
 
           ob_start();
-          require($CLICSHOPPING_Template->getTemplateModules($this->group . '/content/products_info_products_download'));
+          require_once($CLICSHOPPING_Template->getTemplateModules($this->group . '/content/products_info_products_download'));
 
           $products_products_download_content .= ob_get_clean();
 
@@ -94,10 +94,10 @@
       $CLICSHOPPING_Db = Registry::get('Db');
 
       $CLICSHOPPING_Db->save('configuration', [
-          'configuration_title' => 'Souhaitez-vous activer ce module ?',
+          'configuration_title' => 'Do you want to enable this module ?',
           'configuration_key' => 'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_STATUS',
           'configuration_value' => 'True',
-          'configuration_description' => 'Souhaitez vous activer ce module à votre boutique ?',
+          'configuration_description' => 'Do you want to enable this module in your shop ?',
           'configuration_group_id' => '6',
           'sort_order' => '1',
           'set_function' => 'clic_cfg_set_boolean_value(array(\'True\', \'False\'))',
@@ -106,10 +106,10 @@
       );
 
       $CLICSHOPPING_Db->save('configuration', [
-          'configuration_title' => 'Veuillez selectionner la largeur de l\'affichage?',
+          'configuration_title' => 'Please select the width of the display?',
           'configuration_key' => 'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_CONTENT_WIDTH',
           'configuration_value' => '12',
-          'configuration_description' => 'Veuillez indiquer un nombre compris entre 1 et 12',
+          'configuration_description' => 'Please enter a number between 1 and 12',
           'configuration_group_id' => '6',
           'sort_order' => '1',
           'set_function' => 'clic_cfg_set_content_module_width_pull_down',
@@ -118,32 +118,28 @@
       );
 
       $CLICSHOPPING_Db->save('configuration', [
-          'configuration_title' => 'A quel endroit souhaitez-vous afficher le code barre ?',
+          'configuration_title' => 'Where do you want to display the barcode?',
           'configuration_key' => 'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_POSITION',
           'configuration_value' => 'none',
-          'configuration_description' => 'Affiche le code barre du produit à gauche ou à droite<br><br><i>(Valeur Left = Gauche <br>Valeur Right = Droite <br>Valeur None = Aucun)</i>',
+          'configuration_description' => 'Displays the product to the left or right',
           'configuration_group_id' => '6',
           'sort_order' => '2',
-          'set_function' => 'clic_cfg_set_boolean_value(array(\'float-md-right\', \'float-md-left\', \'float-md-none\'),',
+          'configuration_value' => 'none',
           'date_added' => 'now()'
         ]
       );
 
       $CLICSHOPPING_Db->save('configuration', [
-          'configuration_title' => 'Ordre de tri d\'affichage',
+          'configuration_title' => 'Sort order',
           'configuration_key' => 'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_SORT_ORDER',
-          'configuration_value' => '100',
-          'configuration_description' => 'Ordre de tri pour l\'affichage (Le plus petit nombre est montré en premier)',
+          'configuration_value' => '101',
+          'configuration_description' => 'Sort order of display. Lowest is displayed first. The sort order must be different on every module',
           'configuration_group_id' => '6',
           'sort_order' => '3',
           'set_function' => '',
           'date_added' => 'now()'
         ]
       );
-
-      return $CLICSHOPPING_Db->save('configuration', ['configuration_value' => '1'],
-                                              ['configuration_key' => 'WEBSITE_MODULE_INSTALLED']
-                            );
     }
 
     public function remove() {
