@@ -147,7 +147,7 @@
     }
 
     public function keys() {
-      return array (
+      return array(
         'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_STATUS',
         'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_CONTENT_WIDTH',
         'MODULE_PRODUCTS_INFO_PRODUCTS_DOWNLOAD_POSITION',
